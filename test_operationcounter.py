@@ -8,5 +8,7 @@ def test_operationcounter():
         if c > 10:
             c -= 1
         
-        assert counts == {'add':1, 'isub':1, 'mul':1, 'gt':1}
         assert c.v == 16
+        assert counts == {'add':1, 'isub':1, 'mul':1, 'gt':1}
+        assert OperationCounter.grouped(counts) \
+                == {'add':1, 'sub':1, 'mul':1, 'cmp':1}

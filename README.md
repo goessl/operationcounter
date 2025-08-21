@@ -50,6 +50,41 @@ multiplications and $4n+1$ additions".
 ... OperationCounter.counter
 Counter({'mul': 1, 'add': 1, 'gt': 1, 'isub': 1})
 ```
+Or more sophisticated to verify that iterative [iterative polynomial
+evaluation](https://en.wikipedia.org/wiki/Horner%27s_method#Efficiency) takes
+$n$ additions and $2n-1$ multiplications.
+```python
+>>> from itertools import accumulate, repeat
+>>> from functools import reduce
+>>> from operator import mul
+>>> 
+>>> def polyval_iterative(p, x):
+...     """Return the polynomial `p` evaluated at point `x`.
+...     
+...     Uses iterative monomial calculation.
+...     """
+...     #don't do
+...     #return sumprod(p, accumulate(repeat(x, len(p)-1), mul, initial=type(x)(1)))
+...     #as it would introduce two unnecessary multiplications
+...     # one in accumulate: 1, 1*x, x*x, x^2*x, ...
+...     # and one in the sumprod: p[0]*1 + p[1]*x + [p2]*x^2 + ...
+...     monomials = (type(x)(1),) + tuple(accumulate(repeat(x, len(p)-1), mul))
+...     return sum(map(mul, p[1:], monomials[1:]), p[0])
+...     
+>>> p = [1, 2, 3] #polynomial of degree n=2
+>>> x = 5
+>>> 
+>>> from operationcounter import OperationCounter, count_ops
+>>> 
+>>> p = tuple(map(OperationCounter, p))
+>>> x = OperationCounter(x)
+>>> 
+>>> with count_ops() as counter:
+...     assert polyval_iterative(p, x) == 86
+... OperationCounter.counter
+... 
+Counter({'mul': 3, 'add': 2, 'eq': 1})
+```
 
 ### Class: `OperationCounter[T]`
 
@@ -99,16 +134,18 @@ and comparison operations are intercepted and counted.
   Unrecognised counts are copied unchanged.
   
   Parameters
-  ----------
-  counter:
-      A mapping from operation names to the number of times each
-      operation has been executed.
+  
+  `counter`: Counter[str]
+  
+  A mapping from operation names to the number of times each operation has
+  been executed.
   
   Returns
-  -------
-  Counter[str]
-      A new counter where related operations are summed together under
-      a single key.
+  
+  `Counter[str]`
+  
+  A new counter where related operations are summed together under a single
+  key.
 
 ### Context manager: `count_ops()`
 
@@ -121,6 +158,13 @@ with count_ops() as counts:
 print(counts)
 ```
 
+## Warning
+
+Special attention has to be payed to built-in functions like
+[`sum`](https://docs.python.org/3/library/functions.html#sum). It prepends an
+initial `+int(0)` (to correctly return the neutral element for an empty sum)
+and therefore increments the addition counter too.
+
 ## Limitations
 
 - Only counts operations performed **through the wrapper**.
@@ -132,6 +176,7 @@ print(counts)
 
 ## Roadmap
 
+- [ ] `sum`, `sumprod`(?), `reduce` with default instead of initial argument
 - [ ] Threading
 - [ ] More flexible grouping schemes (choose your own families)
 - [ ] Helper to wrap elements of sequences or `numpy.array`s.

@@ -96,7 +96,7 @@ class OperationCounter(Generic[T]):
         
         Parameters
         ----------
-        counter:
+        counter: Counter[str]
             A mapping from operation names to the number of times each
             operation has been executed.
         
@@ -133,7 +133,8 @@ class OperationCounter(Generic[T]):
         
         grouped: Counter[str] = Counter()
         for family, keys in families.items():
-            grouped[family] = sum(counter.get(k, 0) for k in keys)
+            if (s := sum(counter.get(k, 0) for k in keys)):
+                grouped[family] = s
         
         #keep any keys we didn't map
         mapped_keys = {k for keys in families.values() for k in keys}
