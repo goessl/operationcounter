@@ -50,7 +50,7 @@ multiplications and $4n+1$ additions".
 ... OperationCounter.counter
 Counter({'mul': 1, 'add': 1, 'gt': 1, 'isub': 1})
 ```
-Or more sophisticated to verify that iterative [iterative polynomial
+Or more sophisticated to verify that [iterative polynomial
 evaluation](https://en.wikipedia.org/wiki/Horner%27s_method#Efficiency) takes
 $n$ additions and $2n-1$ multiplications.
 ```python
@@ -158,12 +158,40 @@ with count_ops() as counts:
 print(counts)
 ```
 
+### Functions: `reduce_default`, `sum_default`, `prod_default` & `sumprod_default`
+
+- `reduce_default(function, iterable, default=0)`: Apply function of two
+  arguments cumulatively to the items of iterable.
+  
+  Like `functools.reduce` but without the function applied to some initial
+  element and the first element in the iterable. Returns `default` if
+  `iterable` is empty.
+- `sum_default(iterable, default=0)`: Return the sum of all elements in
+  iterable.
+  
+  Like `sum` but without the default initial `0+`. Returns `default` if
+  `iterable` is empty.
+- `prod_default(iterable, default=1)`: Return the product of all elements in
+  iterable.
+  
+  Like `math.prod` but without the default initial `1*`. Returns `default` if
+  `iterable` is empty.
+- `sumprod_default(a, b, default=0)`: Return the sum-product of all elements in
+  the iterables.
+  
+  Like `math.sumprod` but without the default initial `0+`. Returns `default`
+  if any iterable is empty. Zips both iterables, so they can be of different
+  length.
+
 ## Warning
 
 Special attention has to be payed to built-in functions like
 [`sum`](https://docs.python.org/3/library/functions.html#sum). It prepends an
 initial `+int(0)` (to correctly return the neutral element for an empty sum)
 and therefore increments the addition counter too.
+
+For such applications use the provided `reduce_default`, `sum_default`,
+`prod_default` & `sumprod_default`.
 
 ## Limitations
 
@@ -176,7 +204,9 @@ and therefore increments the addition counter too.
 
 ## Roadmap
 
-- [ ] `sum`, `sumprod`(?), `reduce` with default instead of initial argument
+- [x] `sum`, `sumprod`(?), `reduce` with default instead of initial argument
+- [ ] Log all operations with operands so that the binary complexity can be
+  determined.
 - [ ] Threading
 - [ ] More flexible grouping schemes (choose your own families)
 - [ ] Helper to wrap elements of sequences or `numpy.array`s.
