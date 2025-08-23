@@ -31,8 +31,8 @@ git clone https://github.com/goessl/operationcounter.git
 
 Profilers measure wall-clock time or CPU usage, which depends on machine,
 libraries, and optimizations resulting in machine dependent and noisy results.
-**OperationCounter** instead counts *abstract operations* — closer to what we
-use in algorithm analysis (e.g. “merge sort does O(n log n) comparisons”).
+**OperationCounter** instead counts *abstract operations* - closer to what we
+use in algorithm analysis (e.g. "merge sort does O(n log n) comparisons").
 
 I also enable **exact counting**, so that not just a big-O result like
 $\mathcal{O}(n^2)$ can be given but rather "this function does $n^2+3n+2$
