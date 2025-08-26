@@ -26,6 +26,8 @@ git clone https://github.com/goessl/operationcounter.git
   be accounted separately.
 - Provides a `grouped` view to collapse operation families for easier reporting.
 - Simple `count_ops()` context manager for clean measurement runs.
+- `reduce_default`, `sum_default`, `prod_default` & `sumprod_default` that
+  don't perform any unnecessary operations like `+0` or `*1`.
 
 ## Why not just use a profiler?
 
