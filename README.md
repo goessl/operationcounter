@@ -162,24 +162,26 @@ print(counts)
 
 ### Functions: `reduce_default`, `sum_default`, `prod_default` & `sumprod_default`
 
-- `reduce_default(function, iterable, default=0)`: Apply function of two
-  arguments cumulatively to the items of iterable.
+- `MISSING`: Sentiel to mark empty parameters.
+
+- `reduce_default(function, iterable, *, initial=MISSING, default=0)`: Apply
+  function of two arguments cumulatively to the items of iterable.
   
   Like `functools.reduce` but without the function applied to some initial
   element and the first element in the iterable. Returns `default` if
   `iterable` is empty.
-- `sum_default(iterable, default=0)`: Return the sum of all elements in
-  iterable.
+- `sum_default(iterable, *, initial=MISSING, default=0)`: Return the sum of all
+  elements in iterable.
   
   Like `sum` but without the default initial `0+`. Returns `default` if
   `iterable` is empty.
-- `prod_default(iterable, default=1)`: Return the product of all elements in
-  iterable.
+- `prod_default(iterable, *, initial=MISSING, default=1)`: Return the product
+  of all elements in iterable.
   
   Like `math.prod` but without the default initial `1*`. Returns `default` if
   `iterable` is empty.
-- `sumprod_default(a, b, default=0)`: Return the sum-product of all elements in
-  the iterables.
+- `sumprod_default(a, b, *, initial=MISSING, default=0)`: Return the
+  sum-product of all elements in the iterables.
   
   Like `math.sumprod` but without the default initial `0+`. Returns `default`
   if any iterable is empty. Zips both iterables, so they can be of different
