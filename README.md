@@ -27,8 +27,7 @@ git clone https://github.com/goessl/operationcounter.git
 
 ## Documentation
 
-Read the [documentation webpage](https://goessl.github.io/operationcounter)
-or read the [raw markdown](docs/index.md).
+**Enjoy the [documentation webpage](https://goessl.github.io/operationcounter).**
 
 ## License (MIT)
 

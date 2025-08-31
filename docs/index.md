@@ -109,6 +109,7 @@ For such applications **use the provided `reduce_default`, `sum_default`,
 ## Roadmap
 
 - [x] `reduce`, `sum`, `prod` & `sumprod` with default argument.
+- [ ] Wrap sequences.
 - [ ] Accumulators as C extension.
 - [ ] Log all operations with operands so that the binary complexity can be
   determined.

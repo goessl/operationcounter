@@ -1,7 +1,7 @@
 from __future__ import annotations
 from collections import Counter
 from contextlib import contextmanager
-from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, overload
+from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, overload, Generator
 
 __all__ = ('OperationCounter', 'count_ops')
 
@@ -52,25 +52,26 @@ class OperationCounter(Generic[T]):
         """Group individual operation counts into broader categories.
         
         Counts are summed into the following groups:
-        Comparisons
-        - `cmp`      = `lt` + `le` + `eq` + `ne` + `gt` + `ge`
-        Unary operations are left as they are
-        - `pos`, `neg`, `abs`, `invert`
-        Arithmetic
-        - `add`      = `add` + `iadd` + `radd`
-        - `sub`      = `sub` + `isub` + `rsub`
-        - `mul`      = `mul` + `imul` + `rmul`
-        - `truediv`  = `truediv` + `itruediv` + `rtruediv`
-        - `floordiv` = `floordiv` + `ifloordiv` + `rfloordiv`
-        - `mod`      = `mod` + `imod` + `rmod`
-        - `pow`      = `pow` + `ipow` + `rpow`
-        - `divmod`   = `divmod` + `rdivmod`
-        Bitwise
-        - `and`      = `and` + `iand` + `rand`
-        - `or`       = `or` + `ior` + `ror`
-        - `xor`      = `xor` + `ixor` + `rxor`
-        - `lshift`   = `lshift` + `ilshift` + `rlshift`
-        - `rshift`   = `rshift` + `irshift` + `rrshift`
+        
+        - Comparisons
+            - `cmp`      = `lt` + `le` + `eq` + `ne` + `gt` + `ge`
+        - Unary operations are left as they are
+            - `pos`, `neg`, `abs`, `invert`
+        - Arithmetic
+            - `add`      = `add` + `iadd` + `radd`
+            - `sub`      = `sub` + `isub` + `rsub`
+            - `mul`      = `mul` + `imul` + `rmul`
+            - `truediv`  = `truediv` + `itruediv` + `rtruediv`
+            - `floordiv` = `floordiv` + `ifloordiv` + `rfloordiv`
+            - `mod`      = `mod` + `imod` + `rmod`
+            - `pow`      = `pow` + `ipow` + `rpow`
+            - `divmod`   = `divmod` + `rdivmod`
+        - Bitwise
+            - `and`      = `and` + `iand` + `rand`
+            - `or`       = `or` + `ior` + `ror`
+            - `xor`      = `xor` + `ixor` + `rxor`
+            - `lshift`   = `lshift` + `ilshift` + `rlshift`
+            - `rshift`   = `rshift` + `irshift` + `rrshift`
         
         Unrecognised counts are copied unchanged.
         
@@ -86,7 +87,7 @@ class OperationCounter(Generic[T]):
             A new counter where related operations are summed together under
             a single key.
         """
-        families: Dict[str, Tuple[str]] = {
+        families: Dict[str, Tuple[str, ...]] = {
             #comparison
             'cmp':      ('lt', 'le', 'eq', 'ne', 'gt', 'ge'),
             #unary
@@ -387,11 +388,16 @@ class OperationCounter(Generic[T]):
 
 
 @contextmanager
-def count_ops():
+def count_ops() -> Generator[Counter[str]]:
     """Context manager that yields the operation counter.
     
     The `OperationCounter.counter` is cleared on entry and yielded to the
     caller.
+    
+    Yields
+    ------
+    Counter[str]
+        The global `OperationCounter.counter`.
     """
     OperationCounter.reset()
     try:
