@@ -2,6 +2,7 @@ from __future__ import annotations
 from collections import Counter
 from contextlib import contextmanager
 from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, overload, Generator
+from collections.abc import Collection, Mapping, Set, Sequence
 
 __all__ = ('OperationCounter', 'count_ops')
 
@@ -36,6 +37,38 @@ class OperationCounter(Generic[T]):
         """Return a copy of the current operation counts."""
         return OperationCounter.counter.copy()
     
+    @staticmethod
+    def wrap(x: T) -> OperationCounter[T]:
+        """Wrap `v` into an `OperationCounter`.
+        
+        Same as `OperationCounter(x)`.
+        """
+        return OperationCounter(x)
+    
+    @staticmethod
+    def wrapCollection(s: Collection[T]) -> Collection[OperationCounter[T]]:
+        """Wrap the elements of `s` into `OperationCounter`s."""
+        if isinstance(s, Mapping):
+            return type(s)(
+                    (OperationCounter.wrap(k), OperationCounter.wrap(v))
+                    for k, v in s.items())
+        elif isinstance(s, (Set, Sequence)) and not isinstance(s, (str, bytes)):
+            return type(s)(map(OperationCounter.wrap, s))
+        else:
+            raise TypeError(f'Unsupported type: {type(s)}')
+    
+    @staticmethod
+    def wrapArray(a: Any) -> Any:
+        """Return `np.ndarray(a)` with all elements wrapped."""
+        try:
+            import numpy as np
+        except ModuleNotFoundError as e:
+            raise ModuleNotFoundError(
+                'OperationCounter.wrapArray requires `numpy` to be installed.'
+            ) from e
+        
+        return np.vectorize(OperationCounter.wrap, otypes=[object])(a)
+    
     @overload
     @staticmethod
     def unwrap(x: OperationCounter[T]) -> T: ...
@@ -46,6 +79,31 @@ class OperationCounter(Generic[T]):
     def unwrap(x: Any) -> Any:
         """Extract the underlying value if `x` is an `OperationCounter`."""
         return x.v if isinstance(x, OperationCounter) else x
+    
+    @staticmethod
+    def unwrapCollection(s: Collection[OperationCounter[T]]) -> Collection[T]:
+        """Unwrap the elements of `s` from `OperationCounter`s."""
+        if isinstance(s, Mapping):
+            return type(s)(
+                    (OperationCounter.unwrap(k), OperationCounter.unwrap(v))
+                    for k, v in s.items())
+        elif isinstance(s, (Set, Sequence)) and not isinstance(s, (str, bytes)):
+            return type(s)(map(OperationCounter.unwrap, s))
+        else:
+            raise TypeError(f"Unsupported type: {type(s)}")
+    
+    @staticmethod
+    def unwrapArray(a: Any) -> Any:
+        """Return `np.ndarray(a)` with all elements unwrapped."""
+        try:
+            import numpy as np
+        except ModuleNotFoundError as e:
+            raise ModuleNotFoundError(
+                'OperationCounter.unwrapArray requires `numpy` to be installed.'
+            ) from e
+        
+        return np.vectorize(OperationCounter.unwrap, otypes=[object])(a)
+    
     
     @staticmethod
     def grouped(counter: Counter[str]) -> Counter[str]:
@@ -136,6 +194,9 @@ class OperationCounter(Generic[T]):
     
     def __format__(self, spec: str) -> str:
         return format(self.v, spec)
+    
+    def __hash__(self):
+        return hash(self.v)
     
     
     # --- conversion ---

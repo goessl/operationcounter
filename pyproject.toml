@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "operationcounter"
-version = "1.0"
+version = "1.1"
 description = "An arithmetic operation counting package."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -31,6 +31,11 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/goessl/operationcounter"
+
+[project.optional-dependencies]
+numpy = [
+  "numpy"
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["operationcounter"]

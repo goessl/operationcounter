@@ -29,6 +29,31 @@ git clone https://github.com/goessl/operationcounter.git
 
 **Enjoy the [documentation webpage](https://goessl.github.io/operationcounter).**
 
+## Features
+
+- **A class `OperationCounter`** that wraps any Python value and tracks:
+    - Arithmetic operations: `+`, `-`, `*`, `/`, `//`, `%`, `**`, `divmod`
+    - Bitwise operations: `&`, `|`, `^`, `<<`, `>>`
+    - Unary operations: `+x`, `-x`, `abs(x)`, `~x`
+    - Comparisons: `<`, `<=`, `==`, `!=`, `>`, `>=`
+- **Exact accumulators** that don't perform any unnecessary operations like `+0` or
+  `*1` and allow for an **initial and a default argument**:
+    - `reduce_default`,
+    - `sum_default`,
+    - `prod_default` &
+    - `sumprod_default`.
+
+## Roadmap
+
+- [x] `reduce`, `sum`, `prod` & `sumprod` with default argument.
+- [x] Wrap collections.
+- [ ] Accumulators as C extension.
+- [ ] Log all operations with operands so that the binary complexity can be
+  determined.
+- [ ] Threading.
+- [ ] More flexible grouping schemes (choose your own families).
+- [ ] Helper to wrap elements of sequences or `numpy.array`s.
+
 ## License (MIT)
 
 Copyright (c) 2025 Sebastian Gössl
