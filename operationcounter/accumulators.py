@@ -1,13 +1,38 @@
 from functools import reduce
 from operator import mul
 
-__all__ = ('MISSING',
+__all__ = ('MISSING', 'group_ordinal',
            'reduce_default', 'sum_default', 'prod_default', 'sumprod_default')
 
 
 
 MISSING = object()
 """Sentinel to mark empty parameters."""
+
+def group_ordinal(*iterables):
+    """Group elements of iterables by their ordinal.
+    
+        >>> iterables = (1, 2, 3), [4, 5, 6, 7], {8}
+        >>> list(group_ordinal(*iterables))
+        [(1, 4, 8), (2, 5), (3, 6), (7,)]
+    
+    The elements are grouped in the same order as their iterables (stable).
+    
+    References
+    ----------
+    - <https://github.com/more-itertools/more-itertools/pull/1073>
+    """
+    iterators = list(map(iter, reversed(iterables)))
+    result = []
+    while iterators:
+        result.clear()
+        for i in reversed(range(len(iterators))):
+            try:
+                result.append(next(iterators[i]))
+            except StopIteration:
+                del iterators[i]
+        if result:
+            yield tuple(result)
 
 def reduce_default(function, iterable, *, initial=MISSING, default=0):
     """Apply function of two arguments cumulatively to the iterable.

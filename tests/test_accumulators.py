@@ -1,6 +1,23 @@
 from operationcounter import *
 import pytest
 
+
+def test_group_ordinal():
+    iterables = (
+        (1, 2, 3),
+        [4, 5, 6, 7],
+        {8}
+    )
+    expected = [
+        (1, 4, 8),
+        (2, 5),
+        (3, 6),
+        (7,)
+    ]
+    assert list(group_ordinal(*iterables)) == expected
+    #empty case
+    assert list(group_ordinal()) == []
+
 def test_sum_default():
     a = [1, 2, 3, 4]
     a = list(map(OperationCounter, a))
