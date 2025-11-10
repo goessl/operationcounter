@@ -1,7 +1,7 @@
 from functools import reduce
 from operator import mul
 
-__all__ = ('MISSING', 'group_ordinal',
+__all__ = ('MISSING', 'exception_generator', 'group_ordinal',
            'reduce_default', 'sum_default', 'prod_default', 'sumprod_default')
 
 
@@ -9,18 +9,37 @@ __all__ = ('MISSING', 'group_ordinal',
 MISSING = object()
 """Sentinel to mark empty parameters."""
 
+def exception_generator(ex=IndexError):
+    """Raise the provided exception on the first yield.
+    
+    ```python
+    >>> sum(islice(chain([1, 2, 3], exception_generator()), 3))
+    6
+    >>> sum(islice(chain([1, 2, 3], exception_generator()), 4))
+    Traceback (most recent call last):
+      ...
+    IndexError
+    ```
+    
+    Used to ensure that iteration doesn't go to far.
+    """
+    raise ex
+    yield
+
 def group_ordinal(*iterables):
     """Group elements of iterables by their ordinal.
     
-        >>> iterables = (1, 2, 3), [4, 5, 6, 7], {8}
-        >>> list(group_ordinal(*iterables))
-        [(1, 4, 8), (2, 5), (3, 6), (7,)]
+    ```python
+    >>> iterables = (1, 2, 3), [4, 5, 6, 7], {8}
+    >>> list(group_ordinal(*iterables))
+    [(1, 4, 8), (2, 5), (3, 6), (7,)]
+    ```
     
     The elements are grouped in the same order as their iterables (stable).
     
     References
     ----------
-    - <https://github.com/more-itertools/more-itertools/pull/1073>
+    - [more-itertools PR #1073](https://github.com/more-itertools/more-itertools/pull/1073)
     """
     iterators = list(map(iter, reversed(iterables)))
     result = []

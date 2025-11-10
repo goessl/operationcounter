@@ -4,15 +4,16 @@ build-backend = "hatchling.build"
 
 [project]
 name = "operationcounter"
-version = "2.0"
+version = "2.1"
 description = "An arithmetic operation counting package."
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     {name="Sebastian Gössl", email="goessl@student.tugraz.at"}
 ]
-license = "MIT"
-license-files = ["LICENSE"]
+dependencies = ["numpy"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
@@ -30,15 +31,20 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/goessl/operationcounter"
+Homepage = "https://github.com/goessl/operationcounter"
+Documentation = "https://goessl.github.io/operationcounter"
+Repository = "https://github.com/goessl/operationcounter.git"
 
 [project.optional-dependencies]
-numpy = [
-  "numpy"
-]
+test = ["pytest"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["operationcounter"]
+include = ["LICENSE", "README.md"]
 
 [tool.hatch.build.targets.sdist]
-include = ["operationcounter", "README.md", "LICENSE"]
+include = [
+    "operationcounter", "tests",
+    "mkdocs.yml", "docs",
+    "pyproject.toml", "README.md", "LICENSE"
+]
