@@ -23,8 +23,9 @@ def exception_generator(ex=IndexError):
     
     Used to ensure that iteration doesn't go to far.
     """
-    raise ex
-    yield
+    def raiser():
+        raise ex
+    return iter(raiser, object())
 
 def group_ordinal(*iterables):
     """Group elements of iterables by their ordinal.

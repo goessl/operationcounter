@@ -272,7 +272,7 @@ class OperationCounter(Generic[T]):
     
     def __iadd__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['iadd'] += 1
-        self.v = self.v + OperationCounter.unwrap(other)
+        self.v += OperationCounter.unwrap(other)
         return self
     
     
@@ -286,7 +286,7 @@ class OperationCounter(Generic[T]):
     
     def __isub__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['isub'] += 1
-        self.v = self.v - OperationCounter.unwrap(other)
+        self.v -= OperationCounter.unwrap(other)
         return self
     
     
@@ -300,7 +300,7 @@ class OperationCounter(Generic[T]):
     
     def __imul__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['imul'] += 1
-        self.v = self.v * OperationCounter.unwrap(other)
+        self.v *= OperationCounter.unwrap(other)
         return self
     
     
@@ -314,7 +314,7 @@ class OperationCounter(Generic[T]):
     
     def __itruediv__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['itruediv'] += 1
-        self.v = self.v / OperationCounter.unwrap(other)
+        self.v /= OperationCounter.unwrap(other)
         return self
     
     
@@ -328,7 +328,7 @@ class OperationCounter(Generic[T]):
     
     def __ifloordiv__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['ifloordiv'] += 1
-        self.v = self.v // OperationCounter.unwrap(other)
+        self.v //= OperationCounter.unwrap(other)
         return self
     
     
@@ -342,7 +342,7 @@ class OperationCounter(Generic[T]):
     
     def __imod__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['imod'] += 1
-        self.v = self.v % OperationCounter.unwrap(other)
+        self.v %= OperationCounter.unwrap(other)
         return self
     
     
@@ -359,7 +359,7 @@ class OperationCounter(Generic[T]):
     
     def __ipow__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['ipow'] += 1
-        self.v = pow(self.v, OperationCounter.unwrap(other))
+        self.v **= OperationCounter.unwrap(other)
         return self
     
     
@@ -387,7 +387,7 @@ class OperationCounter(Generic[T]):
     
     def __iand__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['iand'] += 1
-        self.v = self.v & OperationCounter.unwrap(other)
+        self.v &= OperationCounter.unwrap(other)
         return self
     
     
@@ -401,7 +401,7 @@ class OperationCounter(Generic[T]):
     
     def __ior__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['ior'] += 1
-        self.v = self.v | OperationCounter.unwrap(other)
+        self.v |= OperationCounter.unwrap(other)
         return self
     
     
@@ -415,7 +415,7 @@ class OperationCounter(Generic[T]):
     
     def __ixor__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['ixor'] += 1
-        self.v = self.v ^ OperationCounter.unwrap(other)
+        self.v ^= OperationCounter.unwrap(other)
         return self
     
     
@@ -429,7 +429,7 @@ class OperationCounter(Generic[T]):
     
     def __ilshift__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['ilshift'] += 1
-        self.v = self.v << OperationCounter.unwrap(other)
+        self.v <<= OperationCounter.unwrap(other)
         return self
     
     
@@ -443,7 +443,7 @@ class OperationCounter(Generic[T]):
     
     def __irshift__(self, other: Any) -> OperationCounter[T]:
         OperationCounter.counter['irshift'] += 1
-        self.v = self.v >> OperationCounter.unwrap(other)
+        self.v >>= OperationCounter.unwrap(other)
         return self
 
 
