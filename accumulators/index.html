@@ -605,7 +605,8 @@
 <span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
-<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">exception_generator</span><span class="p">(</span><span class="n">ex</span><span class="o">=</span><span class="ne">IndexError</span><span class="p">):</span>
+<span class="normal">27</span>
+<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">exception_generator</span><span class="p">(</span><span class="n">ex</span><span class="o">=</span><span class="ne">IndexError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise the provided exception on the first yield.</span>
 
 <span class="sd">    ```python</span>
@@ -619,8 +620,9 @@
 
 <span class="sd">    Used to ensure that iteration doesn&#39;t go to far.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="n">ex</span>
-    <span class="k">yield</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">raiser</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">ex</span>
+    <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">raiser</span><span class="p">,</span> <span class="nb">object</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -657,8 +659,7 @@
 
             <details class="quote">
               <summary>Source code in <code>operationcounter\accumulators.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
-<span class="normal">30</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
@@ -682,7 +683,8 @@
 <span class="normal">51</span>
 <span class="normal">52</span>
 <span class="normal">53</span>
-<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">group_ordinal</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">):</span>
+<span class="normal">54</span>
+<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">group_ordinal</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Group elements of iterables by their ordinal.</span>
 
 <span class="sd">    ```python</span>
@@ -743,8 +745,7 @@ Difference to <code>functools.reduce</code>:</p>
 
             <details class="quote">
               <summary>Source code in <code>operationcounter\accumulators.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">56</span>
-<span class="normal">57</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">57</span>
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span>
@@ -767,7 +768,8 @@ Difference to <code>functools.reduce</code>:</p>
 <span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
-<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reduce_default</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="normal">80</span>
+<span class="normal">81</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reduce_default</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply function of two arguments cumulatively to the iterable.</span>
 
 <span class="sd">    Like `functools.reduce` but with an optional initial element and an</span>
@@ -825,8 +827,7 @@ return value.</p>
 
             <details class="quote">
               <summary>Source code in <code>operationcounter\accumulators.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 82</span>
-<span class="normal"> 83</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 83</span>
 <span class="normal"> 84</span>
 <span class="normal"> 85</span>
 <span class="normal"> 86</span>
@@ -849,7 +850,8 @@ return value.</p>
 <span class="normal">103</span>
 <span class="normal">104</span>
 <span class="normal">105</span>
-<span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sum_default</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="normal">106</span>
+<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sum_default</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sum of all elements in the iterable.</span>
 
 <span class="sd">    Like `sum` but with an optional initial element and an optional default</span>
@@ -907,8 +909,7 @@ default return value.</p>
 
             <details class="quote">
               <summary>Source code in <code>operationcounter\accumulators.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">108</span>
-<span class="normal">109</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
@@ -920,7 +921,8 @@ default return value.</p>
 <span class="normal">118</span>
 <span class="normal">119</span>
 <span class="normal">120</span>
-<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prod_default</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="normal">121</span>
+<span class="normal">122</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prod_default</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product of all elements in the iterable.</span>
 
 <span class="sd">    Like `math.prod` but with an optional initial element and an optional</span>
@@ -967,8 +969,7 @@ default return value and non-strict zipping of both iterables.</p>
 
             <details class="quote">
               <summary>Source code in <code>operationcounter\accumulators.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
-<span class="normal">124</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
@@ -979,7 +980,8 @@ default return value and non-strict zipping of both iterables.</p>
 <span class="normal">132</span>
 <span class="normal">133</span>
 <span class="normal">134</span>
-<span class="normal">135</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sumprod_default</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="normal">135</span>
+<span class="normal">136</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sumprod_default</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sum-product of all elements in the iterables.</span>
 
 <span class="sd">    Like `math.sumprod` but with an optional initial element, an optional</span>
