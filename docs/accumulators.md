@@ -1,4 +1,4 @@
-# Accumulators
+# accumulators
 
 ``` mermaid
 graph TD

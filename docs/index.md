@@ -1,12 +1,10 @@
 # operationcounter
 
-**operationcounter** is a Python package for
-**tracking arithmetic and comparison operations**. It is designed to perform
-complexity analysis empirically and exactly.
+::: operationcounter
+    options:
+      members: false
 
-Unlike profilers (which measure *time*), `OperationCounter` counts *operations*
-like `add`, `iadd`, `lt`, `pow`, `divmod`, etc., giving you a cost model that
-is independent of machine speed.
+## Example
 
 ```python
 >>> from operationcounter import OperationCounter, count_ops
@@ -27,17 +25,20 @@ git clone https://github.com/goessl/operationcounter.git
 
 ## Features
 
-- **A class `OperationCounter`** that wraps any Python value and tracks:
+- **A class [`OperationCounter`][operationcounter.operationcounter]** that wraps any Python value and tracks:
     - Arithmetic operations: `+`, `-`, `*`, `/`, `//`, `%`, `**`, `divmod`
     - Bitwise operations: `&`, `|`, `^`, `<<`, `>>`
     - Unary operations: `+x`, `-x`, `abs(x)`, `~x`
     - Comparisons: `<`, `<=`, `==`, `!=`, `>`, `>=`
-- **Exact accumulators** that don't perform any unnecessary operations like `+0` or
+- **Exact [accumulators][operationcounter.accumulators]** that don't perform any unnecessary operations like `+0` or
   `*1` and allow for an **initial and a default argument**:
-    - `reduce_default`,
-    - `sum_default`,
-    - `prod_default` &
-    - `sumprod_default`.
+    - [`reduce_default`][operationcounter.accumulators.reduce_default],
+    - [`sum_default`][operationcounter.accumulators.sum_default],
+    - [`prod_default`][operationcounter.accumulators.prod_default] &
+    - [`sumprod_default`][operationcounter.accumulators.sumprod_default].
+- **[iterators][operationcounter.iterators]**
+    - [`exception_generator`][operationcounter.iterators.exception_generator] &
+    - [`group_ordinal`][operationcounter.iterators.group_ordinal].
 
 ## Why not just use a profiler?
 

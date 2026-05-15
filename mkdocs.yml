@@ -8,11 +8,6 @@ repo_url: https://github.com/goessl/operationcounter
 
 copyright: Copyright &copy; 2025 Sebastian Gössl
 
-nav:
-  - Home: index.md
-  - OperationCounter: operationcounter.md
-  - Accumulators: accumulators.md
-
 theme:
   name: material
   features:
@@ -48,15 +43,16 @@ plugins:
     handlers:
       python:
         options:
-          show_root_toc_entry: no
-          members_order: source
-          show_symbol_type_heading: yes
-          show_signature_annotations: yes
-          separate_signature: yes
-          docstring_style: numpy
-          docstring_section_style: table
+            show_root_heading: true
+            show_symbol_type_heading: true
+            members_order: source
+            group_by_category: false
+            docstring_style: numpy
+            show_signature_annotations: true
 
-markdown_extensions: #only for material, not for readthedocs
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.highlight
   - pymdownx.superfences:
       custom_fences:
@@ -65,9 +61,13 @@ markdown_extensions: #only for material, not for readthedocs
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.arithmatex:
-      generic: true
 
 extra_javascript:
   - mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - OperationCounter: operationcounter.md
+  - accumulators.md
+  - iterators.md
