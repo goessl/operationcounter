@@ -5,7 +5,12 @@ Iterators.
 
 
 
-def exception_generator(ex=IndexError):
+from typing import Any, Never
+from collections.abc import Iterable, Generator
+
+
+
+def exception_generator(ex:type[Exception]=IndexError) -> Generator[Never]:
     """Raise the provided exception on the first yield.
     
     ```python
@@ -17,13 +22,13 @@ def exception_generator(ex=IndexError):
     IndexError
     ```
     
-    Used to ensure that iteration doesn't go to far.
+    Used to ensure that iteration doesn't go too far.
     """
     def raiser():
         raise ex
     return iter(raiser, object())
 
-def group_ordinal(*iterables):
+def group_ordinal(*iterables:Iterable[Any]) -> tuple[Any,...]:
     """Group elements of iterables by their ordinal.
     
     ```python

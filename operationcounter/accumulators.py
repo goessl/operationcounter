@@ -7,13 +7,15 @@ Accumulators.
 
 from functools import reduce
 from operator import mul
+from typing import Any
+from collections.abc import Callable, Iterable
 
 
 
-MISSING = object()
+MISSING:object = object()
 """Sentinel to mark empty parameters."""
 
-def reduce_default(function, iterable, *, initial=MISSING, default=0):
+def reduce_default(function:Callable[[Any,Any],Any], iterable:Iterable[Any], *, initial:Any=MISSING, default:Any=MISSING) -> Any:
     """Apply function of two arguments cumulatively to the iterable.
     
     Like `functools.reduce` but with an optional initial element and an
@@ -35,11 +37,13 @@ def reduce_default(function, iterable, *, initial=MISSING, default=0):
             if default is not MISSING:
                 return default
             else:
-                raise TypeError("accumulation of empty iterable with no" \
-                        + " initial or default value")
+                raise TypeError(
+                        'accumulation of empty iterable with no'
+                        ' initial or default value'
+                )
         return reduce(function, it, initial)
 
-def sum_default(iterable, *, initial=MISSING, default=0):
+def sum_default(iterable:Iterable[Any], *, initial:Any=MISSING, default:Any=0) -> Any:
     """Return the sum of all elements in the iterable.
     
     Like `sum` but with an optional initial element and an optional default
@@ -61,17 +65,19 @@ def sum_default(iterable, *, initial=MISSING, default=0):
             if default is not MISSING:
                 return default
             else:
-                raise TypeError("accumulation of empty iterable with no" \
-                        + " initial or default value")
+                raise TypeError(
+                        'accumulation of empty iterable with no'
+                        ' initial or default value'
+                )
         return sum(it, start=initial)
 
-def prod_default(iterable, *, initial=MISSING, default=1):
+def prod_default(iterable:Iterable[Any], *, initial:Any=MISSING, default:Any=1) -> Any:
     """Return the product of all elements in the iterable.
     
     Like `math.prod` but with an optional initial element and an optional
     default return value.
     
-    - If `iterable` is empty and `initial` are `default` is `MISSING`, a
+    - If `iterable` is empty and `initial` and `default` are `MISSING`, a
       `TypeError` is raised.
     - If `iterable` is empty and `initial` is `MISSING`, but `default` is not,
       then `default` is returned.
@@ -80,7 +86,7 @@ def prod_default(iterable, *, initial=MISSING, default=1):
     #don't use math.prod, as it may reject non-numeric values
     return reduce_default(mul, iterable, initial=initial, default=default)
 
-def sumprod_default(a, b, *, initial=MISSING, default=0):
+def sumprod_default(a:Iterable[Any], b:Iterable[Any], *, initial:Any=MISSING, default:Any=0) -> Any:
     """Return the sum-product of all elements in the iterables.
     
     Like `math.sumprod` but with an optional initial element, an optional

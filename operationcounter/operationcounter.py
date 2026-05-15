@@ -1,8 +1,8 @@
-from __future__ import annotations
+import operator
 from collections import Counter
 from contextlib import contextmanager
-from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, overload, Generator
-from collections.abc import Collection, Mapping, Set, Sequence
+from typing import Any, ClassVar, Generic, Optional, overload, TypeVar
+from collections.abc import Collection, Generator, Mapping, Set, Sequence
 
 __all__ = ('OperationCounter', 'count_ops')
 
@@ -18,12 +18,12 @@ class OperationCounter(Generic[T]):
     """
     
     
-    counter: Counter[str] = Counter()
+    counter:ClassVar[Counter[str]] = Counter()
     """Live global counter of all operations."""
     
-    def __init__(self, v: T) -> None:
+    def __init__(self, v:T) -> None:
         """Wrap `v` into an `OperationCounter`."""
-        self.v: T = v
+        self.v:T = v
     
     
     # --- utilities ---
@@ -37,8 +37,9 @@ class OperationCounter(Generic[T]):
         """Return a copy of the current operation counts."""
         return OperationCounter.counter.copy()
     
+    
     @staticmethod
-    def wrap(x: T) -> OperationCounter[T]:
+    def wrap(x:T) -> OperationCounter[T]:
         """Wrap `v` into an `OperationCounter`.
         
         Same as `OperationCounter(x)`.
@@ -46,19 +47,19 @@ class OperationCounter(Generic[T]):
         return OperationCounter(x)
     
     @staticmethod
-    def wrapCollection(s: Collection[T]) -> Collection[OperationCounter[T]]:
+    def wrapCollection(s:Collection[T]) -> Collection[OperationCounter[T]]:
         """Wrap the elements of `s` into `OperationCounter`s."""
         if isinstance(s, Mapping):
             return type(s)(
                     (OperationCounter.wrap(k), OperationCounter.wrap(v))
                     for k, v in s.items())
-        elif isinstance(s, (Set, Sequence)) and not isinstance(s, (str, bytes)):
+        elif isinstance(s, (Set, Sequence)):
             return type(s)(map(OperationCounter.wrap, s))
         else:
             raise TypeError(f'Unsupported type: {type(s)}')
     
     @staticmethod
-    def wrapArray(a: Any) -> Any:
+    def wrapArray(a:Any) -> Any:
         """Return `np.ndarray(a)` with all elements wrapped."""
         try:
             import numpy as np
@@ -66,34 +67,34 @@ class OperationCounter(Generic[T]):
             raise ModuleNotFoundError(
                 'OperationCounter.wrapArray requires `numpy` to be installed.'
             ) from e
-        
         return np.vectorize(OperationCounter.wrap, otypes=[object])(a)
+    
     
     @overload
     @staticmethod
-    def unwrap(x: OperationCounter[T]) -> T: ...
+    def unwrap(x:OperationCounter[T]) -> T: ...
     @overload
     @staticmethod
-    def unwrap(x: T) -> T: ...
+    def unwrap(x:T) -> T: ...
     @staticmethod
-    def unwrap(x: Any) -> Any:
+    def unwrap(x:Any) -> Any:
         """Extract the underlying value if `x` is an `OperationCounter`."""
         return x.v if isinstance(x, OperationCounter) else x
     
     @staticmethod
-    def unwrapCollection(s: Collection[OperationCounter[T]]) -> Collection[T]:
+    def unwrapCollection(s:Collection[OperationCounter[T]]) -> Collection[T]:
         """Unwrap the elements of `s` from `OperationCounter`s."""
         if isinstance(s, Mapping):
             return type(s)(
                     (OperationCounter.unwrap(k), OperationCounter.unwrap(v))
                     for k, v in s.items())
-        elif isinstance(s, (Set, Sequence)) and not isinstance(s, (str, bytes)):
+        elif isinstance(s, (Set, Sequence)):
             return type(s)(map(OperationCounter.unwrap, s))
         else:
-            raise TypeError(f"Unsupported type: {type(s)}")
+            raise TypeError(f'Unsupported type: {type(s)}')
     
     @staticmethod
-    def unwrapArray(a: Any) -> Any:
+    def unwrapArray(a:Any) -> Any:
         """Return `np.ndarray(a)` with all elements unwrapped."""
         try:
             import numpy as np
@@ -101,12 +102,11 @@ class OperationCounter(Generic[T]):
             raise ModuleNotFoundError(
                 'OperationCounter.unwrapArray requires `numpy` to be installed.'
             ) from e
-        
         return np.vectorize(OperationCounter.unwrap, otypes=[object])(a)
     
     
     @staticmethod
-    def grouped(counter: Counter[str]) -> Counter[str]:
+    def grouped(counter:Counter[str]) -> Counter[str]:
         """Group individual operation counts into broader categories.
         
         Counts are summed into the following groups:
@@ -145,7 +145,7 @@ class OperationCounter(Generic[T]):
             A new counter where related operations are summed together under
             a single key.
         """
-        families: Dict[str, Tuple[str, ...]] = {
+        families:dict[str, tuple[str, ...]] = {
             #comparison
             'cmp':      ('lt', 'le', 'eq', 'ne', 'gt', 'ge'),
             #unary
@@ -170,7 +170,7 @@ class OperationCounter(Generic[T]):
             'rshift':   ('rshift', 'irshift', 'rrshift')
         }
         
-        grouped: Counter[str] = Counter()
+        grouped:Counter[str] = Counter()
         for family, keys in families.items():
             if (s := sum(counter.get(k, 0) for k in keys)):
                 grouped[family] = s
@@ -192,259 +192,128 @@ class OperationCounter(Generic[T]):
     def __str__(self) -> str:
         return f'OperationCounter({self.v})'
     
-    def __format__(self, spec: str) -> str:
+    def __format__(self, spec:str) -> str:
         return format(self.v, spec)
     
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.v)
     
     
-    # --- conversion ---
-    def __bool__(self) -> bool:
-        OperationCounter.counter['bool'] += 1
-        return bool(self.v)
-    
-    def __int__(self) -> int:
-        OperationCounter.counter['int'] += 1
-        return int(self.v)
-    
-    def __float__(self) -> float:
-        OperationCounter.counter['float'] += 1
-        return float(self.v)
-    
-    def __complex__(self) -> complex:
-        OperationCounter.counter['complex'] += 1
-        return complex(self.v)
-    
-    
-    # --- comparison ---
-    def __lt__(self, other: Any) -> bool:
-        OperationCounter.counter['lt'] += 1
-        return self.v < OperationCounter.unwrap(other)
-    
-    def __le__(self, other: Any) -> bool:
-        OperationCounter.counter['le'] += 1
-        return self.v <= OperationCounter.unwrap(other)
-    
-    def __eq__(self, other: Any) -> bool:
-        OperationCounter.counter['eq'] += 1
-        return self.v == OperationCounter.unwrap(other)
-    
-    def __ne__(self, other: Any) -> bool:
-        OperationCounter.counter['ne'] += 1
-        return self.v != OperationCounter.unwrap(other)
-    
-    def __gt__(self, other: Any) -> bool:
-        OperationCounter.counter['gt'] += 1
-        return self.v > OperationCounter.unwrap(other)
-    
-    def __ge__(self, other: Any) -> bool:
-        OperationCounter.counter['ge'] += 1
-        return self.v >= OperationCounter.unwrap(other)
-    
-    
-    # --- unary ---
-    def __pos__(self) -> OperationCounter[T]:
-        OperationCounter.counter['pos'] += 1
-        return OperationCounter(+self.v)
-    
-    def __neg__(self) -> OperationCounter[T]:
-        OperationCounter.counter['neg'] += 1
-        return OperationCounter(-self.v)
-    
-    def __abs__(self) -> OperationCounter[T]:
-        OperationCounter.counter['abs'] += 1
-        return OperationCounter(abs(self.v))
-    
-    def __invert__(self) -> OperationCounter[T]:
-        OperationCounter.counter['invert'] += 1
-        return OperationCounter(~self.v)
-    
-    
-    # --- arithmetic ---
-    def __add__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['add'] += 1
-        return OperationCounter(self.v + OperationCounter.unwrap(other))
-    
-    def __radd__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['radd'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) + self.v)
-    
-    def __iadd__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['iadd'] += 1
-        self.v += OperationCounter.unwrap(other)
-        return self
-    
-    
-    def __sub__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['sub'] += 1
-        return OperationCounter(self.v - OperationCounter.unwrap(other))
-    
-    def __rsub__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rsub'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) - self.v)
-    
-    def __isub__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['isub'] += 1
-        self.v -= OperationCounter.unwrap(other)
-        return self
-    
-    
-    def __mul__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['mul'] += 1
-        return OperationCounter(self.v * OperationCounter.unwrap(other))
-    
-    def __rmul__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rmul'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) * self.v)
-    
-    def __imul__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['imul'] += 1
-        self.v *= OperationCounter.unwrap(other)
-        return self
-    
-    
-    def __truediv__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['truediv'] += 1
-        return OperationCounter(self.v / OperationCounter.unwrap(other))
-    
-    def __rtruediv__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rtruediv'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) / self.v)
-    
-    def __itruediv__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['itruediv'] += 1
-        self.v /= OperationCounter.unwrap(other)
-        return self
-    
-    
-    def __floordiv__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['floordiv'] += 1
-        return OperationCounter(self.v // OperationCounter.unwrap(other))
-    
-    def __rfloordiv__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rfloordiv'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) // self.v)
-    
-    def __ifloordiv__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['ifloordiv'] += 1
-        self.v //= OperationCounter.unwrap(other)
-        return self
-    
-    
-    def __mod__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['mod'] += 1
-        return OperationCounter(self.v % OperationCounter.unwrap(other))
-    
-    def __rmod__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rmod'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) % self.v)
-    
-    def __imod__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['imod'] += 1
-        self.v %= OperationCounter.unwrap(other)
-        return self
-    
-    
-    def __pow__(self, other: Any, mod: Optional[int] = None) \
+    # --- special arithmetic (non-regular signatures) ---
+    def __pow__(self, other:Any, mod:Optional[int]=None) \
             -> OperationCounter[T]:
         OperationCounter.counter['pow'] += 1
         o = OperationCounter.unwrap(other)
         return OperationCounter(
                 pow(self.v, o, mod) if mod is not None else pow(self.v, o))
     
-    def __rpow__(self, other: Any) -> OperationCounter[T]:
+    def __rpow__(self, other:Any, mod:Optional[int]=None) \
+            -> OperationCounter[T]:
         OperationCounter.counter['rpow'] += 1
-        return OperationCounter(pow(OperationCounter.unwrap(other), self.v))
+        o = OperationCounter.unwrap(other)
+        return OperationCounter(
+                pow(o, self.v, mod) if mod is not None else pow(o, self.v))
     
-    def __ipow__(self, other: Any) -> OperationCounter[T]:
+    def __ipow__(self, other:Any, mod:Optional[int]=None) \
+            -> OperationCounter[T]:
         OperationCounter.counter['ipow'] += 1
-        self.v **= OperationCounter.unwrap(other)
+        o = OperationCounter.unwrap(other)
+        self.v = pow(self.v, o, mod) if mod is not None else pow(self.v, o)
         return self
     
-    
-    def __divmod__(self, other: Any) \
-            -> Tuple[OperationCounter[T], OperationCounter[T]]:
+    def __divmod__(self, other:Any) \
+            -> tuple[OperationCounter[T], OperationCounter[T]]:
         OperationCounter.counter['divmod'] += 1
         q, r = divmod(self.v, OperationCounter.unwrap(other))
         return OperationCounter(q), OperationCounter(r)
     
-    def __rdivmod__(self, other: Any) \
-            -> Tuple[OperationCounter[T], OperationCounter[T]]:
+    def __rdivmod__(self, other:Any) \
+            -> tuple[OperationCounter[T], OperationCounter[T]]:
         OperationCounter.counter['rdivmod'] += 1
         q, r = divmod(OperationCounter.unwrap(other), self.v)
         return OperationCounter(q), OperationCounter(r)
-    
-    
-    # --- bitwise ---
-    def __and__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['and'] += 1
-        return OperationCounter(self.v & OperationCounter.unwrap(other))
-    
-    def __rand__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rand'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) & self.v)
-    
-    def __iand__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['iand'] += 1
-        self.v &= OperationCounter.unwrap(other)
+
+
+
+# --- operation factories ---
+def _convert(key, fn):
+    def method(self):
+        OperationCounter.counter[key] += 1
+        return fn(self.v)
+    return method
+
+for _name, _fn in {'bool':    bool,
+                   'int':     int,
+                   'float':   float,
+                   'complex': complex}.items():
+    setattr(OperationCounter, f'__{_name}__', _convert(_name, _fn))
+
+
+def _cmp(key, fn):
+    def method(self, other):
+        OperationCounter.counter[key] += 1
+        return fn(self.v, OperationCounter.unwrap(other))
+    return method
+
+for _name, _fn in {'lt': operator.lt,
+                   'le': operator.le,
+                   'eq': operator.eq,
+                   'ne': operator.ne,
+                   'gt': operator.gt,
+                   'ge': operator.ge}.items():
+    setattr(OperationCounter, f'__{_name}__', _cmp(_name, _fn))
+
+
+def _unary(key, fn):
+    def method(self):
+        OperationCounter.counter[key] += 1
+        return OperationCounter(fn(self.v))
+    return method
+
+for _name, _fn in {'pos':    operator.pos,
+                   'neg':    operator.neg,
+                   'abs':    abs,
+                   'invert': operator.invert}.items():
+    setattr(OperationCounter, f'__{_name}__', _unary(_name, _fn))
+
+
+def _binary(key, fn):
+    def method(self, other):
+        OperationCounter.counter[key] += 1
+        return OperationCounter(fn(self.v, OperationCounter.unwrap(other)))
+    return method
+
+def _rbinary(key, fn):
+    def method(self, other):
+        OperationCounter.counter[key] += 1
+        return OperationCounter(fn(OperationCounter.unwrap(other), self.v))
+    return method
+
+def _ibinary(key, fn):
+    def method(self, other):
+        OperationCounter.counter[key] += 1
+        self.v = fn(self.v, OperationCounter.unwrap(other))
         return self
-    
-    
-    def __or__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['or'] += 1
-        return OperationCounter(self.v | OperationCounter.unwrap(other))
-    
-    def __ror__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['ror'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) | self.v)
-    
-    def __ior__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['ior'] += 1
-        self.v |= OperationCounter.unwrap(other)
-        return self
-    
-    
-    def __xor__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['xor'] += 1
-        return OperationCounter(self.v ^ OperationCounter.unwrap(other))
-    
-    def __rxor__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rxor'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) ^ self.v)
-    
-    def __ixor__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['ixor'] += 1
-        self.v ^= OperationCounter.unwrap(other)
-        return self
-    
-    
-    def __lshift__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['lshift'] += 1
-        return OperationCounter(self.v << OperationCounter.unwrap(other))
-    
-    def __rlshift__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rlshift'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) << self.v)
-    
-    def __ilshift__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['ilshift'] += 1
-        self.v <<= OperationCounter.unwrap(other)
-        return self
-    
-    
-    def __rshift__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rshift'] += 1
-        return OperationCounter(self.v >> OperationCounter.unwrap(other))
-    
-    def __rrshift__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['rrshift'] += 1
-        return OperationCounter(OperationCounter.unwrap(other) >> self.v)
-    
-    def __irshift__(self, other: Any) -> OperationCounter[T]:
-        OperationCounter.counter['irshift'] += 1
-        self.v >>= OperationCounter.unwrap(other)
-        return self
+    return method
+
+for _name, (_fn, _ifn) in {
+        'add':      (operator.add,      operator.iadd),
+        'sub':      (operator.sub,      operator.isub),
+        'mul':      (operator.mul,      operator.imul),
+        'matmul':   (operator.matmul,   operator.imatmul),
+        'truediv':  (operator.truediv,  operator.itruediv),
+        'floordiv': (operator.floordiv, operator.ifloordiv),
+        'mod':      (operator.mod,      operator.imod),
+        'and':      (operator.and_,     operator.iand),
+        'or':       (operator.or_,      operator.ior),
+        'xor':      (operator.xor,      operator.ixor),
+        'lshift':   (operator.lshift,   operator.ilshift),
+        'rshift':   (operator.rshift,   operator.irshift)}.items():
+    setattr(OperationCounter, f'__{_name}__',  _binary(_name, _fn))
+    setattr(OperationCounter, f'__r{_name}__', _rbinary(f'r{_name}', _fn))
+    setattr(OperationCounter, f'__i{_name}__', _ibinary(f'i{_name}', _ifn))
+#pow, rpow, ipow, divmod, rdivmod don't fit this pattern
+#and are therefore written explicitly
 
 
 
@@ -461,7 +330,4 @@ def count_ops() -> Generator[Counter[str]]:
         The global `OperationCounter.counter`.
     """
     OperationCounter.reset()
-    try:
-        yield OperationCounter.counter
-    finally:
-        pass
+    yield OperationCounter.counter
